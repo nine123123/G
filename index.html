@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>แบบทดสอบคลิกตอบ + เฉลย (แชร์)</title>
+<style>
+  html, body { height:100%; margin:0; padding:0; font-family: "TH Sarabun New", "Sarabun", Arial, sans-serif; background:#f7f7f8; color:#111; }
+  body { display:flex; align-items:flex-start; justify-content:center; min-height:100vh; padding:30px 16px; box-sizing:border-box; }
+  .container { max-width:1100px; width:100%; margin:0 auto; padding-top:8px; }
+  h1 { font-size:28px; margin-bottom:6px; }
+  .card { background:white; border-radius:12px; padding:16px; margin:12px 0; box-shadow:0 2px 8px rgba(0,0,0,0.06); width:100%; }
+  .btn { display:inline-block; padding:8px 12px; border-radius:8px; border:1px solid #cfcfcf; background:#fff; cursor:pointer; user-select:none; margin-right:8px; }
+  .btn.muted { background:#e9e9ea; color:#333; border-color:#e1e1e1; }
+  .btn.outline { background:#fff; color:#333; }
+  .btn.success { background:#16a34a; color:#fff; border-color:#16a34a; }
+  .btn.danger { background:#dc2626; color:#fff; border-color:#dc2626; }
+  .meta { font-size:13px; color:#666; margin-bottom:8px; }
+  .controls { margin-top:8px; }
+  .chapter-title { font-weight:700; margin-top:6px; }
+  .scorebox { font-weight:700; background:#111; color:#fff; padding:8px; border-radius:8px; display:inline-block; }
+  .explain { margin-top:8px; padding:10px; background:#fafafa; border-left:4px solid #eee; }
+  .q-item { padding:10px; border-radius:8px; border:1px solid #f0f0f0; margin-bottom:8px; }
+  .selected { box-shadow: inset 0 0 0 2px rgba(0,0,0,0.03); }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>แบบทดสอบคลิกตอบ + เฉลย (แชร์)</h1>
+  <div class="meta">เลือก จริง/เท็จ แล้วกด "ตรวจคำตอบทั้งหมด" เพื่อเฉลย. ปุ่มสีเทาแสดงว่าคุณเลือกแล้ว. ดาวน์โหลดไฟล์เพื่อส่งให้คนอื่นเปิดได้ (ไฟล์เดียว เปิดผ่านเบราว์เซอร์).</div>
+
+  <div class="card controls">
+    <span class="scorebox" id="score">0 / 0</span>
+    <button class="btn" id="revealBtn">ตรวจคำตอบทั้งหมด</button>
+    <button class="btn" id="hideBtn">ซ่อนเฉลย</button>
+    <button class="btn" id="resetBtn">เริ่มใหม่</button>
+    <button class="btn" id="csvBtn">ดาวน์โหลดผล (.csv)</button>
+    <a class="btn" id="downloadZip" href="#" download="quiz_for_sharing.zip">ดาวน์โหลดไฟล์ ZIP</a>
+  </div>
+
+  <div id="quiz"></div>
+
+  <div class="card">
+    <div class="meta">ไฟล์นี้สร้างจากคำถามในเอกสารของผู้เรียน — สามารถแจกไฟล์นี้ให้เพื่อน/นักศึกษาเปิดผ่านเว็บเบราว์เซอร์ได้เลย</div>
+  </div>
+</div>
+<script>
+const chapters = [{"title": "บทที่ 1", "questions": [{"q": "ความดันสัมบูรณ์ (Absolute Pressure) สามารถหาได้จากผลรวมของความดันบรรยากาศ (Atmospheric Pressure) และความดันเกจ (Gauge Pressure)", "correct": true, "explain": "ความดันสัมบูรณ์คือผลรวมของความดันบรรยากาศและความดันเกจ"}, {"q": "กลไกการเกิด Thermal NOₓ เกิดจากการทำปฏิกิริยาของไนโตรเจน (N₂) และออกซิเจน (O₂) ในอากาศที่อุณหภูมิสูง ซึ่งแตกต่างจาก Fuel NOₓ ที่เกิดจากไนโตรเจนที่มีอยู่ในเชื้อเพลิงเอง", "correct": true, "explain": "Thermal NOₓ เกิดจาก N₂ และ O₂ ในอากาศทำปฏิกิริยากันที่อุณหภูมิสูง ต่างจาก Fuel NOₓ ที่มาจากไนโตรเจนในเชื้อเพลิง"}, {"q": "ในการคำนวณการเผาไหม้โดยทั่วไป อากาศจะถูกพิจารณาว่ามีออกซิเจน (O₂) 21% และไนโตรเจน (N₂) 79% โดยน้ำหนัก", "correct": false, "explain": "ค่า 21%/79% เป็นการพิจารณาโดยปริมาตร (by volume) ไม่ใช่โดยน้ำหนัก"}, {"q": "ปริมาตรโมล (Molar Volume) ของก๊าซ 1 โมล ที่อุณหภูมิ 25 °C และความดัน 1 atm มีค่าเท่ากับ 22.4 ลิตร", "correct": false, "explain": "22.4 L/mol เป็นค่าสำหรับ STP (0 °C, 1 atm) ที่ 25 °C ปริมาตรโมลจะมากกว่า 22.4 L"}, {"q": "\"ไอเสียชื้น\" หมายถึง ไอเสียที่รวมน้ำจากเชื้อเพลิงและไอน้ำจากการเผาไหม้เข้าไว้ด้วยกัน", "correct": true, "explain": "ไอเสียชื้นมีทั้งน้ำจากเชื้อเพลิงและไอน้ำจากการเผาไหม้รวมอยู่ด้วย"}]}, {"title": "บทที่ 2", "questions": [{"q": "ค่า Capture Velocity ที่เหมาะสมสำหรับการดักจับมลพิษจะขึ้นอยู่กับลักษณะการแพร่กระจายของมลพิษ เช่น ถ้ามลพิษแพร่กระจายอย่างรวดเร็วและมีทิศทาง จะต้องใช้ Capture Velocity ที่สูงขึ้น", "correct": true, "explain": "ยิ่งมลพิษแพร่กระจายเร็วหรือมีแรงส่งมาก ต้องใช้ Capture Velocity สูงขึ้น"}, {"q": "องค์ประกอบหลักของระบบระบายอากาศเสียแบบเฉพาะที่ (Local Exhaust Ventilation) เมื่อเรียงตามลำดับการไหลของอากาศส่วนใหญ่จะเป็น: Hood > ท่อดูด > พัดลม > อุปกรณ์บำบัดมลพิษ > ปล่องระบาย", "correct": false, "explain": "ลำดับที่ถูกต้องคือ Hood > ท่อดูด > อุปกรณ์บำบัดมลพิษ > พัดลม > ปล่องระบาย เพื่อป้องกันพัดลม"}, {"q": "ในการออกแบบระบบท่อระบายอากาศแบบเฉพาะที่ การคงความเร็วลมในท่อให้ต่ำกว่าค่าแนะนำเป็นสิ่งที่ยอมรับได้หากช่วยประหยัดพลังงานได้มาก โดยที่ยังไม่เกิดการตกค้างของฝุ่นที่มองเห็นได้", "correct": false, "explain": "ต่ำกว่าค่าแนะนำจะสะสมอุดตันระยะยาว ลดประสิทธิภาพ แม้ระยะสั้นจะยังไม่เห็น"}, {"q": "การเลือกความเร็วในการจับมลพิษ (Capture Velocity) ที่เหมาะสมเป็นสิ่งสำคัญในการออกแบบ Hood โดยหากมลพิษถูกปล่อยออกมาด้วยความเร็วสูง ก็ควรเลือกใช้ Capture Velocity ที่สูงตามไปด้วย", "correct": true, "explain": "มลพิษพุ่งแรง ต้องใช้ Capture Velocity สูงพอจะดึงเข้าฮูดทัน"}, {"q": "อัตราส่วนอากาศ (m) คือสัดส่วนของอากาศที่ใช้จริงต่ออากาศที่ต้องการตามทฤษฎี ซึ่งโดยทั่วไปจะมีค่าน้อยกว่า 1 เพื่อเป็นการประหยัดพลังงาน", "correct": false, "explain": "m ต้อง ≥ 1 ถ้าน้อยกว่า 1 การเผาไหม้ไม่สมบูรณ์ เกิด CO และควัน"}]}, {"title": "บทที่ 3", "questions": [{"q": "(T/F) เครื่องควบคุมฝุ่นละอองประเภท Wet Scrubber มีข้อดีคือสามารถกำจัดฝุ่นละอองและก๊าซบางชนิดได้พร้อมกัน แต่มีข้อจำกัดคือทำให้เกิดปัญหาน้ำเสียที่ต้องบำบัดต่อ.", "correct": true, "explain": "กำจัดได้ทั้งฝุ่นและก๊าซ แต่ก่อให้เกิดน้ำเสียที่ต้องบำบัดต่อ"}, {"q": "กลไกการแพร่ (Diffusion) เป็นกลไกหลักที่ทำให้เครื่องดักฝุ่นแบบไซโคลน (Cyclone) มีประสิทธิภาพสูงในการดักจับอนุภาคฝุ่นขนาดใหญ่ (มากกว่า 10 ไมครอน)", "correct": false, "explain": "ไซโคลนเด่นที่แรงเฉื่อยและแรงโน้มถ่วง ส่วน diffusion สำคัญกับอนุภาคเล็กมาก"}, {"q": "หากฝุ่นที่สะสมบนแผ่นเก็บฝุ่นในเครื่อง EP มีค่าความต้านทานไฟฟ้าสูงเกินไป อาจทำให้เกิด Back Corona ซึ่งส่งผลให้ประสิทธิภาพการเก็บฝุ่นลดลง", "correct": true, "explain": "ค่าความต้านทานสูงทำให้เกิด back corona ลดประสิทธิภาพ"}, {"q": "ประสิทธิภาพรวมของเครื่องควบคุมฝุ่นละอองหลายเครื่องที่ต่อกันแบบอนุกรม จะคำนวณโดยการนำประสิทธิภาพย่อยของแต่ละเครื่องมาเฉลี่ยแบบถ่วงน้ำหนัก", "correct": false, "explain": "หลายเครื่องต่ออนุกรม ไม่ใช่เฉลี่ยถ่วงน้ำหนักแบบหลายขนาดอนุภาคในเครื่องเดียว"}, {"q": "เครื่องดักฝุ่นแบบไฟฟ้าสถิต (ESP) มีขั้นตอนสำคัญ: Charging, Collecting, Removal", "correct": true, "explain": "3 ขั้นตอนหลักของ ESP คือ Charging → Collecting → Removal"}]}, {"title": "บทที่ 4", "questions": [{"q": "ค่าคงที่ของเฮนรี่ (Henry's Law Constant, H) หากมีค่าสูง แสดงว่าก๊าซมลพิษชนิดนั้นสามารถละลายในของเหลวได้ดีมาก", "correct": false, "explain": "จาก y = Hx ค่า H ต่ำต่างหากที่บ่งชี้ว่าละลายดี"}, {"q": "ตามประกาศกระทรวงอุตสาหกรรม พ.ศ. 2549 (ฉบับทั่วไป) หากโรงงานใช้เชื้อเพลิง 2 ชนิดผสมกัน คือ ไม้สับ 60% และน้ำมันเตา 40% ค่ามาตรฐาน SO₂ ต้องยึดตามค่าของน้ำมันเตา เพราะมีค่ามาตรฐานสูงกว่า", "correct": false, "explain": "ให้ยึดตามเชื้อเพลิงที่มีสัดส่วนการใช้มากที่สุด ในกรณีนี้คือไม้สับ 60%"}, {"q": "การดูดกลืน (Absorption) เป็นกลไกที่ก๊าซมลพิษละลายลงในของเหลว ในขณะที่การดูดซับ (Adsorption) เป็นกลไกที่โมเลกุลของก๊าซมลพิษถูกดูดให้ติดกับผิวของตัวดูดซับ", "correct": true, "explain": "นิยามตรงตามต้นฉบับ"}, {"q": "Breakthrough Curve เป็นกราฟที่แสดงการทำงานของชั้นสารดูดซับ โดยมีแกน X เป็นเวลา/ปริมาตร และแกน Y เป็นความเข้มข้นที่ออก ใช้หา Breakthrough Time และความยาว MTZ", "correct": true, "explain": "ใช้ประเมิน BT time และ MTZ"}, {"q": "การฟื้นสภาพ (Regenerate) ตัวดูดซับที่อิ่มตัวแล้ว สามารถทำได้โดยการลดอุณหภูมิ หรือเพิ่มความดัน", "correct": false, "explain": "หลักๆ คือเพิ่มอุณหภูมิหรือ ลดความดัน เพื่อไล่โมเลกุลออก"}]}, {"title": "บทที่ 5", "questions": [{"q": "ตามกฎหมายไทย ค่าความเข้มกลิ่นที่กำหนดโดยใช้ D/T ถูกเรียกว่า \"หน่วย\" และ D/T = 100 หมายถึง ต้องใช้อากาศ 100 ส่วนต่อตัวอย่าง 1 ส่วนในการเจือจางให้กลิ่นอยู่ในระดับที่เริ่มรู้สึกได้", "correct": true, "explain": "D/T = 100 คืออากาศ 100 ส่วน ต่อ ตัวอย่าง 1 ส่วน"}, {"q": "ระบบกำจัดกลิ่นด้วยวิธีชีวภาพ (Biofilter) เหมาะสมกับ VOC เข้มข้นสูงๆ ส่วน Catalytic Oxidation เหมาะกับแก๊สอันตรายที่มีความเข้มข้นต่ำ", "correct": false, "explain": "Biofilter ไม่เหมาะกับความเข้มสูงมาก ระบบไวต่อการเปลี่ยนแปลง"}, {"q": "Biofilter มีค่าใช้จ่ายเดินระบบต่ำ ไม่ต้องใช้สารเคมี แต่ไวต่อการเปลี่ยนแปลงและโหลดพิษสูง", "correct": true, "explain": "ข้อดีและข้อจำกัดตรงตามต้นฉบับ"}, {"q": "กฎกระทรวง พ.ศ. 2548 บังคับให้โรงงานทุกแห่งตรวจวัดกลิ่นด้วยวิธีดมอย่างสม่ำเสมอ", "correct": false, "explain": "ตรวจเฉพาะกรณีถูกร้องเรียนหรือสงสัย และครอบคลุมโรงงานบางประเภท"}, {"q": "Direct Combustion และ Catalytic Oxidation ไม่สามารถกำจัดกลิ่นจากสารอนินทรีย์ที่เผาไหม้ไม่ได้", "correct": true, "explain": "ข้อจำกัดร่วมของกระบวนการ"}]}, {"title": "บทที่ 6", "questions": [{"q": "แนวทางการจัดทำบัญชีการปล่อยมลพิษแบบ Top-down Approach คือการเก็บข้อมูลในพื้นที่โดยการสุ่มตัวอย่างแล้วประมาณขยายผลออกไป", "correct": false, "explain": "Top-down ใช้ข้อมูลภาพรวมแล้วประมาณลงพื้นที่ ไม่ใช่สุ่มในพื้นที่"}, {"q": "แนวทางการจัดทำบัญชีการปล่อยมลพิษแบบ Bottom-up Approach เหมาะสำหรับประเมินมลพิษภาพรวมประเทศ เพราะใช้ข้อมูลระดับมหภาค", "correct": false, "explain": "Bottom-up เริ่มจากข้อมูลย่อยแล้วขยายผล ไม่ใช่ข้อมูลมหภาค"}, {"q": "ข้อมูลสำคัญในบัญชีการปล่อยมลพิษอากาศ (EI) ประกอบด้วยแหล่งกำเนิด (ชนิด/จำนวน) และปริมาณมลพิษที่ปล่อยต่อเวลา", "correct": true, "explain": "องค์ประกอบข้อมูลหลักของ EI"}, {"q": "การประมาณการแบบละเอียด (Tier 3) ตาม IPCC จะพิจารณารายละเอียดเทคโนโลยีเตาเผาและอุปกรณ์ควบคุมมลพิษ", "correct": true, "explain": "Tier 3 พิจารณารายละเอียดเชิงลึก"}, {"q": "การประมาณการปล่อยมลพิษแบบสมดุลมวล (Material Balance) เหมาะเป็นพิเศษเมื่อสารตั้งต้นสูญเสียไปในไอเสียจำนวนมาก", "correct": true, "explain": "เหมาะเมื่อมีการสูญเสียสารตั้งต้นไปกับไอเสียมาก"}]}, {"title": "บทที่ 7", "questions": [{"q": "การเก็บตัวอย่างฝุ่นละอองจากปล่องต้องใช้วิธี Isokinetic sampling เสมอ", "correct": true, "explain": "เพื่อให้ได้ตัวอย่างแทนจริง"}, {"q": "ในการเก็บตัวอย่างแบบ Isokinetic หาก Vn ต่ำกว่า Vs ผลวัดฝุ่นจะสูงเกินจริง", "correct": true, "explain": "ก๊าซเลี้ยวออก แต่ฝุ่นแรงเฉื่อยยังเข้า ทำให้เก็บเกินจริง"}, {"q": "การวิเคราะห์ก๊าซปล่องตาม U.S. EPA Method 3 ด้วย Orsat Analyzer จะได้ CO₂, SO₂ และ O₂", "correct": false, "explain": "Orsat ให้ CO₂, O₂ และ CO ไม่ใช่ SO₂"}, {"q": "ต้องเก็บตัวอย่างหลายจุดบนหน้าตัดปล่องเพราะความเร็วและองค์ประกอบไม่สม่ำเสมอ", "correct": true, "explain": "หลักการของ Method 1"}, {"q": "ตาม U.S. EPA Method 5 หาก %Isokinetic = 88% ยังยอมรับได้", "correct": false, "explain": "ช่วงยอมรับ 90–110% เท่านั้น"}]}, {"title": "บทที่ 8", "questions": [{"q": "โรงงานที่เข้าข่ายต้องจัดทำรายงานมลพิษอากาศ (แบบ รว.3) จะต้องตรวจวัดค่ามลพิษจากปล่องปีละ 2 ครั้ง", "correct": true, "explain": "ตรวจทุก 6 เดือน หรือปีละ 2 ครั้ง และยื่นรายงาน รว.3"}, {"q": "ตามพระราชบัญญัติโรงงาน พ.ศ. 2562 โรงงานจำพวกที่ 2 คือโรงงานที่มีเครื่องจักรตั้งแต่ 75 แรงม้าขึ้นไป หรือคนงานตั้งแต่ 75 คนขึ้นไป และต้องได้รับใบอนุญาตก่อนเริ่มประกอบกิจการ", "correct": false, "explain": "จำพวกที่ 2 คือไม่เกิน 75 แรงม้า หรือไม่เกิน 75 คน และต้องแจ้ง ไม่ใช่ขออนุญาต"}, {"q": "กฎหมายควบคุม VOCs พ.ศ. 2565 สำหรับถังกักเก็บ หอเผาทิ้ง และการซ่อมบำรุง บังคับใช้กับโรงงานทุกประเภทที่มีการใช้ VOCs", "correct": false, "explain": "บังคับเฉพาะ 4 ลำดับ คือ 42, 44, 49, 89"}, {"q": "ประกาศ พ.ศ. 2565 เรื่อง CEMS บังคับโรงงานทุกประเภททั่วประเทศ", "correct": false, "explain": "ครอบคลุมทั่วประเทศ แต่บังคับเฉพาะ 13 ประเภทการผลิต"}, {"q": "ประกาศปี 2547 สำหรับโรงงานผลิต/ส่ง/จำหน่ายไฟฟ้า กำหนดมาตรฐาน CO โดยเฉพาะ", "correct": false, "explain": "ประกาศปี 2547 กำหนด TSP, SO₂, NOₓ ไม่ครอบคลุม CO"}]}];
+// chapters JSON injected above
+let answers = chapters.map(ch => ch.questions.map(()=>null));
+let reveal = false;
+
+function render() {
+  const quiz = document.getElementById('quiz');
+  quiz.innerHTML = '';
+  let total = 0, score = 0;
+  chapters.forEach((ch, ci)=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    const title = document.createElement('div');
+    title.className = 'chapter-title';
+    title.textContent = ch.title;
+    card.appendChild(title);
+    ch.questions.forEach((q, qi)=>{
+      total += 1;
+      const qbox = document.createElement('div');
+      qbox.className = 'q-item';
+      const p = document.createElement('div');
+      p.innerHTML = '<strong>' + (ci+1) + '.' + (qi+1) + '</strong> ' + escapeHtml(q.q);
+      qbox.appendChild(p);
+      const btnT = document.createElement('button');
+      btnT.className = 'btn outline';
+      btnT.textContent = 'จริง (T)';
+      btnT.onclick = ()=> { answers[ci][qi] = true; render(); };
+      const btnF = document.createElement('button');
+      btnF.className = 'btn outline';
+      btnF.textContent = 'เท็จ (F)';
+      btnF.onclick = ()=> { answers[ci][qi] = false; render(); };
+      if (!reveal) {
+        if (answers[ci][qi] === true) btnT.className = 'btn muted selected';
+        if (answers[ci][qi] === false) btnF.className = 'btn muted selected';
+      } else {
+        if (answers[ci][qi] === true) btnT.className = (answers[ci][qi] === q.correct) ? 'btn success' : 'btn danger';
+        if (answers[ci][qi] === false) btnF.className = (answers[ci][qi] === q.correct) ? 'btn success' : 'btn danger';
+      }
+      qbox.appendChild(btnT);
+      qbox.appendChild(btnF);
+
+      if (reveal) {
+        const ex = document.createElement('div');
+        ex.className = 'explain';
+        const correctText = q.correct ? 'จริง' : 'เท็จ';
+        const your = (answers[ci][qi] === null) ? 'ไม่ได้ตอบ' : (answers[ci][qi] ? 'จริง' : 'เท็จ');
+        ex.innerHTML = '<div><strong>เฉลย:</strong> ' + correctText + '</div><div><strong>คำตอบของคุณ:</strong> ' + your + '</div><div style="margin-top:6px">' + escapeHtml(q.explain) + '</div>';
+        qbox.appendChild(ex);
+      }
+
+      if (answers[ci][qi] === q.correct) score += 1;
+
+      card.appendChild(qbox);
+    });
+    quiz.appendChild(card);
+  });
+  document.getElementById('score').textContent = score + ' / ' + total;
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+}
+
+document.getElementById('revealBtn').onclick = ()=> { reveal = true; render(); };
+document.getElementById('hideBtn').onclick = ()=> { reveal = false; render(); };
+document.getElementById('resetBtn').onclick = ()=> { answers = chapters.map(ch => ch.questions.map(()=>null)); reveal=false; render(); };
+document.getElementById('csvBtn').onclick = ()=> {
+  const rows = [['chapter','q_index','question','correct','your_answer']];
+  chapters.forEach((ch,ci)=> ch.questions.forEach((q,qi)=> {
+    rows.push([ch.title, qi+1, q.q, q.correct ? 'True' : 'False', answers[ci][qi]===null ? '' : (answers[ci][qi] ? 'True' : 'False')]);
+  }));
+  const csv = rows.map(r => r.map(c=> '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'quiz_results.csv'; a.click();
+  URL.revokeObjectURL(url);
+};
+
+// point download to attached zip in same folder
+document.getElementById('downloadZip').href = 'quiz_for_sharing.zip';
+
+render();
+</script>
+</body>
+</html>

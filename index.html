@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>แบบทดสอบ T/F (100 ข้อ) — Practice & Exam</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>แบบทดสอบ T/F (100 ข้อ)</h1>
+      <p class="muted">โหลดจากไฟล์ <code>questions.json</code> • โหมด Practice & Exam • รองรับมือถือ</p>
+    </header>
+
+    <section id="landing" class="card">
+      <h2>เริ่มต้น</h2>
+      <div class="grid2">
+        <div>
+          <label>จำนวนข้อในชุด</label>
+          <input id="poolSize" type="number" min="1" placeholder="เช่น 30">
+        </div>
+        <div>
+          <label>เวลาสอบ (นาที)</label>
+          <input id="examMinutes" type="number" min="5" value="60">
+        </div>
+      </div>
+
+      <label class="row">
+        <input id="noBack" type="checkbox">
+        <span>ห้ามย้อนกลับระหว่างทำ (Exam)</span>
+      </label>
+
+      <div class="btnrow">
+        <button id="btnPractice" class="primary">เริ่ม Practice</button>
+        <button id="btnExam" class="success">เริ่ม Exam</button>
+      </div>
+
+      <p class="muted small">คำแนะนำ: Practice จะเฉลยทันทีหลังตอบ ส่วน Exam จะเฉลยเมื่อส่งหรือหมดเวลา</p>
+      <p class="muted small">ถ้าใน <code>questions.json</code> มีฟิลด์ <code>answer</code> เป็น 'T' หรือ 'F' ระบบจะตรวจให้เอง; ถ้าเว้นว่าง จะเป็นการให้คะแนนตัวเอง</p>
+    </section>
+
+    <section id="quiz" class="card hidden">
+      <div class="row between">
+        <div>
+          <div id="modeLabel" class="muted small"></div>
+          <h2 id="progress">ข้อ 1/1</h2>
+          <div class="progressbar"><div id="progressFill"></div></div>
+        </div>
+        <div id="timerBox" class="right hidden">
+          <div class="muted small">เวลา</div>
+          <div id="timer" class="timer">00:00</div>
+          <div class="btnrow right">
+            <button id="btnTimer" class="success">เริ่ม</button>
+            <button id="btnSubmit" class="danger">ส่ง</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="meta" class="muted small"></div>
+      <div id="statement" class="statement"></div>
+
+      <div class="btnrow">
+        <button id="btnT" class="wide">T — จริง</button>
+        <button id="btnF" class="wide">F — เท็จ</button>
+      </div>
+
+      <div id="feedback" class="feedback hidden"></div>
+
+      <div class="row between mt">
+        <div class="btnrow">
+          <button id="btnPrev">ก่อนหน้า</button>
+          <button id="btnNext">ถัดไป</button>
+        </div>
+        <div class="btnrow">
+          <button id="btnShuffle">สุ่มชุดใหม่</button>
+          <button id="btnReview" class="primary">ดูสรุป</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="review" class="card hidden">
+      <h2>สรุปผล</h2>
+      <div id="summary" class="muted"></div>
+      <div id="reviewList" class="list"></div>
+      <div class="btnrow mt">
+        <button id="btnRestart">เริ่มใหม่</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
